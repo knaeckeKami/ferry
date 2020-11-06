@@ -32,7 +32,7 @@ void main() {
     );
 
     when(mockLink.request(any, any)).thenAnswer(
-      (_) => Stream.value(Response(data: data.toJson())),
+      (_) => Stream.value(Response(data: data.toJson())).delay(Duration(milliseconds: 0)), //a
     );
 
     StreamController<OperationRequest> requestController;

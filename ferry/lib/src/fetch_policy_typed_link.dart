@@ -85,12 +85,9 @@ class FetchPolicyTypedLink extends TypedLink {
           final responseStreamFromNetwork =
               _optimisticLinkTypedLink.request(operationRequest);
 
-          final controller =
-              StreamController<OperationResponse<TData, TVars>>();
-          final networkStreamSubscription = responseStreamFromNetwork
-              .listen(controller.add, onError: controller.addError);
 
-          final sharedNetworkStream = controller.stream.shareValue();
+
+          final sharedNetworkStream = responseStreamFromNetwork.shareValue();
 
           return _cacheTypedLink
               .request(operationRequest)
@@ -103,9 +100,7 @@ class FetchPolicyTypedLink extends TypedLink {
                       Stream.value(networkResponse),
                       _cacheTypedLink.request(operationRequest).skip(1),
                     ]))
-          ]).doOnCancel(() {
-            networkStreamSubscription.cancel();
-          });
+          ]);
         }
     }
     return null;
