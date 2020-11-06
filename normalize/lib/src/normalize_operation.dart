@@ -8,6 +8,7 @@ import 'package:normalize/src/utils/get_operation_definition.dart';
 import 'package:normalize/src/normalize_node.dart';
 import 'package:normalize/src/config/normalization_config.dart';
 import 'package:normalize/src/utils/add_typename_visitor.dart';
+import 'package:normalize/src/utils/get_fragment_map.dart';
 
 /// Normalizes data for a given query
 ///
@@ -33,6 +34,7 @@ void normalizeOperation({
   Map<String, TypePolicy> typePolicies = const {},
   DataIdResolver dataIdFromObject,
   bool addTypename = false,
+  bool acceptPartialData = true,
   String referenceKey = '\$ref',
 }) {
   if (addTypename) {
@@ -49,20 +51,15 @@ void normalizeOperation({
     typePolicies,
   );
 
-  final fragmentMap = {
-    for (var fragmentDefinition
-        in document.definitions.whereType<FragmentDefinitionNode>())
-      fragmentDefinition.name.value: fragmentDefinition
-  };
-
   final config = NormalizationConfig(
     read: read,
     variables: variables,
     typePolicies: typePolicies,
     referenceKey: referenceKey,
-    fragmentMap: fragmentMap,
+    fragmentMap: getFragmentMap(document),
     addTypename: addTypename,
     dataIdFromObject: dataIdFromObject,
+    allowPartialData: acceptPartialData,
   );
 
   write(

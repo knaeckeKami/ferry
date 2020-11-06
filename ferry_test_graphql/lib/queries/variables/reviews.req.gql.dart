@@ -2,7 +2,7 @@
 
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:ferry/ferry.dart' as _i1;
+import 'package:ferry_exec/ferry_exec.dart' as _i1;
 import 'package:ferry_test_graphql/queries/variables/reviews.ast.gql.dart'
     as _i5;
 import 'package:ferry_test_graphql/queries/variables/reviews.data.gql.dart'
@@ -26,7 +26,8 @@ abstract class GReviewsReq
   static void _initializeBuilder(GReviewsReqBuilder b) => b
     ..operation =
         _i4.Operation(document: _i5.document, operationName: 'Reviews')
-    ..requestId = _i6.Uuid().v1();
+    ..requestId = _i6.Uuid().v1()
+    ..executeOnListen = true;
   _i3.GReviewsVars get vars;
   _i4.Operation get operation;
   _i4.Request get execRequest =>
@@ -45,6 +46,8 @@ abstract class GReviewsReq
   Map<String, dynamic> get updateCacheHandlerContext;
   @nullable
   _i1.FetchPolicy get fetchPolicy;
+  @nullable
+  bool get executeOnListen;
   @override
   _i2.GReviewsData parseData(Map<String, dynamic> json) =>
       _i2.GReviewsData.fromJson(json);

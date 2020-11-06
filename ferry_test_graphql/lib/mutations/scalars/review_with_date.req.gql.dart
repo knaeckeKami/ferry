@@ -2,7 +2,7 @@
 
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:ferry/ferry.dart' as _i1;
+import 'package:ferry_exec/ferry_exec.dart' as _i1;
 import 'package:ferry_test_graphql/mutations/scalars/review_with_date.ast.gql.dart'
     as _i5;
 import 'package:ferry_test_graphql/mutations/scalars/review_with_date.data.gql.dart'
@@ -27,7 +27,8 @@ abstract class GReviewWithDateReq
   static void _initializeBuilder(GReviewWithDateReqBuilder b) => b
     ..operation =
         _i4.Operation(document: _i5.document, operationName: 'ReviewWithDate')
-    ..requestId = _i6.Uuid().v1();
+    ..requestId = _i6.Uuid().v1()
+    ..executeOnListen = true;
   _i3.GReviewWithDateVars get vars;
   _i4.Operation get operation;
   _i4.Request get execRequest =>
@@ -46,6 +47,8 @@ abstract class GReviewWithDateReq
   Map<String, dynamic> get updateCacheHandlerContext;
   @nullable
   _i1.FetchPolicy get fetchPolicy;
+  @nullable
+  bool get executeOnListen;
   @override
   _i2.GReviewWithDateData parseData(Map<String, dynamic> json) =>
       _i2.GReviewWithDateData.fromJson(json);

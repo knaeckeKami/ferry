@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:normalize/src/utils/resolve_data_id.dart';
 import 'package:normalize/src/utils/field_key.dart';
 import 'package:normalize/src/utils/expand_fragments.dart';
+import 'package:normalize/src/utils/exceptions.dart';
 import 'package:normalize/src/config/normalization_config.dart';
 import 'package:normalize/src/policies/field_policy.dart';
 
@@ -48,7 +49,7 @@ Object normalizeNode({
     final typePolicy = (config.typePolicies ?? const {})[typename];
 
     final subNodes = expandFragments(
-      data: dataForNode,
+      typename: typename,
       selectionSet: selectionSet,
       fragmentMap: config.fragmentMap,
     );
@@ -57,6 +58,8 @@ Object normalizeNode({
       if (config.addTypename && typename != null) '__typename': typename,
       ...subNodes.fold({}, (data, field) {
         final fieldPolicy = (typePolicy?.fields ?? const {})[field.name.value];
+        final policyCanMerge = fieldPolicy?.merge != null;
+        final policyCanRead = fieldPolicy?.read != null;
         final fieldName = FieldKey(
           field,
           config.variables,
@@ -65,25 +68,46 @@ Object normalizeNode({
         final existingFieldData = existingNormalizedData is Map
             ? existingNormalizedData[fieldName]
             : null;
-        final fieldData = normalizeNode(
-          selectionSet: field.selectionSet,
-          dataForNode: dataForNode[field.alias?.value ?? field.name.value],
-          existingNormalizedData: existingFieldData,
-          config: config,
-          write: write,
-        );
-        if (fieldPolicy?.merge != null) {
-          return data
-            ..[fieldName] = fieldPolicy.merge(
-              existingFieldData,
-              fieldData,
-              FieldFunctionOptions(
-                field: field,
-                config: config,
-              ),
-            );
+        final inputKey = field.alias?.value ?? field.name.value;
+
+        /// If the policy can't merge or read,
+        /// And the key is missing from the data,
+        /// we have partial data.
+        ///
+        /// We have to consider reads because maybe
+        /// this is a virtualized field, and thus can't be written regardless
+        if (!(policyCanMerge || policyCanRead) &&
+            !dataForNode.containsKey(inputKey)) {
+          // if partial data is accepted, we proceed as usual
+          // and just write nulls where data is missing
+          if (!config.allowPartialData) {
+            throw PartialDataException(path: [inputKey]);
+          }
         }
-        return data..[fieldName] = fieldData;
+
+        try {
+          final fieldData = normalizeNode(
+            selectionSet: field.selectionSet,
+            dataForNode: dataForNode[inputKey],
+            existingNormalizedData: existingFieldData,
+            config: config,
+            write: write,
+          );
+          if (policyCanMerge) {
+            return data
+              ..[fieldName] = fieldPolicy.merge(
+                existingFieldData,
+                fieldData,
+                FieldFunctionOptions(
+                  field: field,
+                  config: config,
+                ),
+              );
+          }
+          return data..[fieldName] = fieldData;
+        } on PartialDataException catch (e) {
+          throw PartialDataException(path: [inputKey, ...e.path]);
+        }
       })
     };
 

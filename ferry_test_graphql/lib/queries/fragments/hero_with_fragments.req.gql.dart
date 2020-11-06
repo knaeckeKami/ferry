@@ -2,7 +2,7 @@
 
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:ferry/ferry.dart' as _i1;
+import 'package:ferry_exec/ferry_exec.dart' as _i1;
 import 'package:ferry_test_graphql/queries/fragments/hero_with_fragments.ast.gql.dart'
     as _i5;
 import 'package:ferry_test_graphql/queries/fragments/hero_with_fragments.data.gql.dart'
@@ -30,7 +30,8 @@ abstract class GHeroWithFragmentsReq
   static void _initializeBuilder(GHeroWithFragmentsReqBuilder b) => b
     ..operation = _i4.Operation(
         document: _i5.document, operationName: 'HeroWithFragments')
-    ..requestId = _i6.Uuid().v1();
+    ..requestId = _i6.Uuid().v1()
+    ..executeOnListen = true;
   _i3.GHeroWithFragmentsVars get vars;
   _i4.Operation get operation;
   _i4.Request get execRequest =>
@@ -49,6 +50,8 @@ abstract class GHeroWithFragmentsReq
   Map<String, dynamic> get updateCacheHandlerContext;
   @nullable
   _i1.FetchPolicy get fetchPolicy;
+  @nullable
+  bool get executeOnListen;
   @override
   _i2.GHeroWithFragmentsData parseData(Map<String, dynamic> json) =>
       _i2.GHeroWithFragmentsData.fromJson(json);

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ferry/ferry.dart';
+import 'package:gql_link/gql_link.dart';
 import 'package:gql_exec/gql_exec.dart';
 import 'package:gql_exec/src/response.dart';
 import 'package:test/test.dart';
@@ -50,14 +51,14 @@ void main() {
     ]) {
       final req = GHumanWithArgsReq(
         (b) => b
-          ..vars.id = "123"
+          ..vars.id = '123'
           ..fetchPolicy = fetchPolicy,
       );
 
       expect(link.hasCanceledStreamCompleter.isCompleted, isFalse);
       StreamSubscription subscription;
       subscription = client
-          .responseStream(req)
+          .request(req)
           .where((event) => event.dataSource == DataSource.Link)
           .listen((event) async {
         //cancel subscription after first item
