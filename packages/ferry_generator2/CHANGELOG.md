@@ -1,3 +1,7 @@
+## 0.1.0-dev.6
+
+ - **FIX**(generator2): validate variables in custom scalar literals (#675).
+
 ## 0.1.0-dev.5
 
  - **FIX**(generator2): skip root __typename on subscriptions (#669).

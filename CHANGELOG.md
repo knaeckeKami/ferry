@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-07-05
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`ferry_generator2` - `v0.1.0-dev.6`](#ferry_generator2---v010-dev6)
+
+---
+
+#### `ferry_generator2` - `v0.1.0-dev.6`
+
+ - **FIX**(generator2): validate variables in custom scalar literals (#675).
+
+
 ## 2026-04-04
 
 ### Changes
