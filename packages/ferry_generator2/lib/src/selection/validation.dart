@@ -465,7 +465,39 @@ class DocumentValidator {
             "Invalid value for $contextName: expected ${expectedType.name.value}",
           );
         }
+        _validateVariablesInScalarLiteral(value, context);
         return;
+      }
+    }
+  }
+
+  void _validateVariablesInScalarLiteral(
+    ValueNode value,
+    ValidationContext context,
+  ) {
+    if (value is VariableNode) {
+      final variableName = value.name.value;
+      context.usedVariables.add(variableName);
+
+      if (context.variableDefinitions.containsKey(variableName) ||
+          context.allowUndefinedVariables) {
+        return;
+      }
+      throw StateError(
+        "Variable $variableName is used but not defined in operation ${context.operationName}",
+      );
+    }
+
+    if (value is ListValueNode) {
+      for (final entry in value.values) {
+        _validateVariablesInScalarLiteral(entry, context);
+      }
+      return;
+    }
+
+    if (value is ObjectValueNode) {
+      for (final field in value.fields) {
+        _validateVariablesInScalarLiteral(field.value, context);
       }
     }
   }
